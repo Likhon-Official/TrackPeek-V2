@@ -23,7 +23,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
     let stepIndex = 0;
 
     const progressInterval = setInterval(() => {
-      progressValue += Math.random() * 10 + 5;
+      progressValue += Math.random() * 15 + 10; // Faster progress
       
       if (progressValue >= 100) {
         progressValue = 100;
@@ -34,7 +34,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
         // Complete loading after showing 100%
         setTimeout(() => {
           onComplete();
-        }, 1000);
+        }, 800);
       } else {
         setProgress(progressValue);
         
@@ -50,16 +50,16 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
           setDisplayText(loadingSteps[stepIndex]);
         }
       }
-    }, 150);
+    }, 120); // Faster interval
 
-    // Fallback to ensure loading never gets stuck
+    // Reduced fallback timeout
     const fallbackTimeout = setTimeout(() => {
       setProgress(100);
       clearInterval(progressInterval);
       setTimeout(() => {
         onComplete();
-      }, 500);
-    }, 4000);
+      }, 300);
+    }, 2500); // Shorter fallback
 
     return () => {
       clearInterval(progressInterval);
@@ -69,7 +69,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
-      {/* Simplified animated background */}
+      {/* Simplified animated background - CSS only */}
       <div className="absolute inset-0 opacity-10">
         <div 
           className="h-full w-full"
