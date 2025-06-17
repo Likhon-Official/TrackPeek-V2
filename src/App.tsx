@@ -12,43 +12,17 @@ function App() {
   const [showContent, setShowContent] = useState(false);
   const [activeScanner, setActiveScanner] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [loadingProgress, setLoadingProgress] = useState(0);
 
   const fullText = "TrackPeek";
 
-  // Improved loading simulation with guaranteed completion
+  // Simple loading with guaranteed completion
   useEffect(() => {
-    let progressValue = 0;
-    const loadingInterval = setInterval(() => {
-      progressValue += Math.random() * 15 + 5;
-      
-      if (progressValue >= 100) {
-        progressValue = 100;
-        setLoadingProgress(100);
-        clearInterval(loadingInterval);
-        
-        // Ensure loading completes after a short delay
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 1000);
-      } else {
-        setLoadingProgress(progressValue);
-      }
-    }, 200);
+    // Force loading to complete after 3 seconds maximum
+    const loadingTimer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
 
-    // Fallback to ensure loading never gets stuck
-    const fallbackTimeout = setTimeout(() => {
-      setLoadingProgress(100);
-      clearInterval(loadingInterval);
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 500);
-    }, 5000);
-
-    return () => {
-      clearInterval(loadingInterval);
-      clearTimeout(fallbackTimeout);
-    };
+    return () => clearTimeout(loadingTimer);
   }, []);
 
   // Typing effect after loading
@@ -133,12 +107,7 @@ function App() {
   };
 
   if (isLoading) {
-    return (
-      <LoadingScreen 
-        progress={loadingProgress} 
-        onComplete={() => setIsLoading(false)} 
-      />
-    );
+    return <LoadingScreen onComplete={() => setIsLoading(false)} />;
   }
 
   if (activeScanner) {
