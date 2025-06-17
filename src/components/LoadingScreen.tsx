@@ -19,33 +19,35 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete, progress }) =
   ];
 
   useEffect(() => {
-    const stepIndex = Math.floor((progress / 100) * loadingSteps.length);
-    if (stepIndex < loadingSteps.length && stepIndex !== currentStep) {
+    const stepIndex = Math.min(Math.floor((progress / 100) * loadingSteps.length), loadingSteps.length - 1);
+    if (stepIndex !== currentStep && stepIndex < loadingSteps.length) {
       setCurrentStep(stepIndex);
       setDisplayText(loadingSteps[stepIndex]);
     }
     
+    // Ensure completion happens when progress reaches 100
     if (progress >= 100) {
-      setTimeout(onComplete, 500);
+      setTimeout(() => {
+        onComplete();
+      }, 800);
     }
-  }, [progress, onComplete, currentStep]);
+  }, [progress, onComplete, currentStep, loadingSteps]);
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
-      {/* Animated background grid */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="grid grid-cols-12 grid-rows-12 h-full w-full">
-          {Array.from({ length: 144 }).map((_, i) => (
-            <div
-              key={i}
-              className="border-green-900 border-r border-b animate-pulse"
-              style={{ 
-                animationDelay: `${(i * 0.1) % 3}s`,
-                animationDuration: '2s'
-              }}
-            />
-          ))}
-        </div>
+      {/* Simplified animated background grid */}
+      <div className="absolute inset-0 opacity-10">
+        <div 
+          className="h-full w-full"
+          style={{
+            backgroundImage: `
+              linear-gradient(90deg, #00ff41 1px, transparent 1px),
+              linear-gradient(#00ff41 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px',
+            animation: 'pulse 2s infinite'
+          }}
+        />
       </div>
 
       <div className="relative z-10 text-center max-w-md mx-auto p-6">
@@ -72,12 +74,12 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete, progress }) =
           <div className="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
             <div 
               className="h-full bg-gradient-to-r from-green-500 to-cyan-400 transition-all duration-300 ease-out"
-              style={{ width: `${progress}%` }}
+              style={{ width: `${Math.min(progress, 100)}%` }}
             />
           </div>
           <div className="flex justify-between text-xs text-green-400 mt-2 font-mono">
             <span>Loading...</span>
-            <span>{Math.round(progress)}%</span>
+            <span>{Math.round(Math.min(progress, 100))}%</span>
           </div>
         </div>
 
@@ -104,7 +106,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete, progress }) =
         </div>
       </div>
 
-      {/* Scanlines effect */}
+      {/* Simplified scanlines effect */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="h-full w-full opacity-10" style={{
           backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, #00ff41 2px, #00ff41 4px)',
