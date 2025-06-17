@@ -9,55 +9,53 @@ const MatrixRain: React.FC<MatrixRainProps> = ({ intensity = 0.02, className = '
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>();
   const [isVisible, setIsVisible] = useState(true);
-  const [isLowPerformance, setIsLowPerformance] = useState(false);
+  const [shouldRender, setShouldRender] = useState(true);
 
   useEffect(() => {
-    // Check for low performance devices
+    // Check if device can handle canvas animation
     const checkPerformance = () => {
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       const isLowMemory = (navigator as any).deviceMemory && (navigator as any).deviceMemory < 4;
       const isSlowCPU = navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4;
       
-      setIsLowPerformance(isMobile || isLowMemory || isSlowCPU);
+      // Disable canvas on low-performance devices
+      if (isMobile || isLowMemory || isSlowCPU) {
+        setShouldRender(false);
+      }
     };
 
     checkPerformance();
   }, []);
 
   useEffect(() => {
+    if (!shouldRender) return;
+
     const canvas = canvasRef.current;
-    if (!canvas || isLowPerformance) return;
+    if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set canvas size with device pixel ratio consideration
+    // Set canvas size
     const resizeCanvas = () => {
-      const rect = canvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2); // Limit DPR for performance
-      
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      
-      ctx.scale(dpr, dpr);
-      canvas.style.width = rect.width + 'px';
-      canvas.style.height = rect.height + 'px';
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     };
     
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Optimized matrix characters
+    // Matrix characters
     const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
     const fontSize = 14;
-    const columns = Math.floor(canvas.width / fontSize / (window.devicePixelRatio || 1));
-    const drops: number[] = Array(Math.min(columns, 50)).fill(1); // Limit columns for performance
+    const columns = Math.floor(canvas.width / fontSize);
+    const drops: number[] = Array(Math.min(columns, 100)).fill(1); // Limit columns
 
     let lastTime = 0;
-    const targetFPS = 30; // Lower FPS for better performance
+    const targetFPS = 20; // Lower FPS for better performance
     const frameInterval = 1000 / targetFPS;
 
-    // Animation function with performance optimization
+    // Animation function
     const animate = (currentTime: number) => {
       if (currentTime - lastTime < frameInterval) {
         if (isVisible) {
@@ -75,8 +73,8 @@ const MatrixRain: React.FC<MatrixRainProps> = ({ intensity = 0.02, className = '
       ctx.fillStyle = '#00ff41';
       ctx.font = `${fontSize}px monospace`;
 
-      // Only update a subset of drops each frame for performance
-      const dropsToUpdate = Math.ceil(drops.length * 0.3);
+      // Only update some drops each frame
+      const dropsToUpdate = Math.ceil(drops.length * 0.2);
       for (let i = 0; i < dropsToUpdate; i++) {
         const dropIndex = Math.floor(Math.random() * drops.length);
         
@@ -109,7 +107,7 @@ const MatrixRain: React.FC<MatrixRainProps> = ({ intensity = 0.02, className = '
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isVisible, intensity, isLowPerformance]);
+  }, [isVisible, intensity, shouldRender]);
 
   // Pause animation when not visible for performance
   useEffect(() => {
@@ -121,8 +119,8 @@ const MatrixRain: React.FC<MatrixRainProps> = ({ intensity = 0.02, className = '
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
-  // Return simplified version for low performance devices
-  if (isLowPerformance) {
+  // Return CSS fallback for low-performance devices
+  if (!shouldRender) {
     return (
       <div 
         className={`fixed inset-0 pointer-events-none opacity-10 ${className}`}
