@@ -51,6 +51,32 @@
   50% { transform: translateX(0); }
 }
 
+/* Matrix-specific animations for CSS-only implementation */
+@keyframes matrixPulse {
+  0%, 100% { 
+    opacity: 0.05;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.15;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes matrixScan {
+  0% { 
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% { 
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
 /* Improved glitch animations - more subtle and closer */
 @keyframes glitch-red {
   0%, 100% { 
