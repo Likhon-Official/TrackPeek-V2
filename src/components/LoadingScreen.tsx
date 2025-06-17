@@ -3,10 +3,10 @@ import { Terminal, Zap, Shield, Eye } from 'lucide-react';
 
 interface LoadingScreenProps {
   onComplete: () => void;
-  progress: number;
 }
 
-const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete, progress }) => {
+const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
+  const [progress, setProgress] = useState(0);
   const [displayText, setDisplayText] = useState('');
   const [currentStep, setCurrentStep] = useState(0);
   
@@ -19,23 +19,57 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete, progress }) =
   ];
 
   useEffect(() => {
-    const stepIndex = Math.min(Math.floor((progress / 100) * loadingSteps.length), loadingSteps.length - 1);
-    if (stepIndex !== currentStep && stepIndex < loadingSteps.length) {
-      setCurrentStep(stepIndex);
-      setDisplayText(loadingSteps[stepIndex]);
-    }
-    
-    // Ensure completion happens when progress reaches 100
-    if (progress >= 100) {
+    let progressValue = 0;
+    let stepIndex = 0;
+
+    const progressInterval = setInterval(() => {
+      progressValue += Math.random() * 10 + 5;
+      
+      if (progressValue >= 100) {
+        progressValue = 100;
+        setProgress(100);
+        setDisplayText(loadingSteps[loadingSteps.length - 1]);
+        clearInterval(progressInterval);
+        
+        // Complete loading after showing 100%
+        setTimeout(() => {
+          onComplete();
+        }, 1000);
+      } else {
+        setProgress(progressValue);
+        
+        // Update step text based on progress
+        const newStepIndex = Math.min(
+          Math.floor((progressValue / 100) * (loadingSteps.length - 1)), 
+          loadingSteps.length - 1
+        );
+        
+        if (newStepIndex !== stepIndex) {
+          stepIndex = newStepIndex;
+          setCurrentStep(stepIndex);
+          setDisplayText(loadingSteps[stepIndex]);
+        }
+      }
+    }, 150);
+
+    // Fallback to ensure loading never gets stuck
+    const fallbackTimeout = setTimeout(() => {
+      setProgress(100);
+      clearInterval(progressInterval);
       setTimeout(() => {
         onComplete();
-      }, 800);
-    }
-  }, [progress, onComplete, currentStep, loadingSteps]);
+      }, 500);
+    }, 4000);
+
+    return () => {
+      clearInterval(progressInterval);
+      clearTimeout(fallbackTimeout);
+    };
+  }, [onComplete]);
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
-      {/* Simplified animated background grid */}
+      {/* Simplified animated background */}
       <div className="absolute inset-0 opacity-10">
         <div 
           className="h-full w-full"
