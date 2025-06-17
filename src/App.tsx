@@ -16,19 +16,39 @@ function App() {
 
   const fullText = "TrackPeek";
 
-  // Loading simulation
+  // Improved loading simulation with guaranteed completion
   useEffect(() => {
+    let progressValue = 0;
     const loadingInterval = setInterval(() => {
-      setLoadingProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(loadingInterval);
-          return 100;
-        }
-        return prev + Math.random() * 15 + 5;
-      });
+      progressValue += Math.random() * 15 + 5;
+      
+      if (progressValue >= 100) {
+        progressValue = 100;
+        setLoadingProgress(100);
+        clearInterval(loadingInterval);
+        
+        // Ensure loading completes after a short delay
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1000);
+      } else {
+        setLoadingProgress(progressValue);
+      }
     }, 200);
 
-    return () => clearInterval(loadingInterval);
+    // Fallback to ensure loading never gets stuck
+    const fallbackTimeout = setTimeout(() => {
+      setLoadingProgress(100);
+      clearInterval(loadingInterval);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
+    }, 5000);
+
+    return () => {
+      clearInterval(loadingInterval);
+      clearTimeout(fallbackTimeout);
+    };
   }, []);
 
   // Typing effect after loading
@@ -47,7 +67,7 @@ function App() {
 
       return () => clearInterval(timer);
     }
-  }, [isLoading]);
+  }, [isLoading, fullText]);
 
   const scannerOptions = [
     {
