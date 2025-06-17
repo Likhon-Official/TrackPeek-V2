@@ -15,12 +15,12 @@ function App() {
 
   const fullText = "TrackPeek";
 
-  // Simple loading with guaranteed completion
+  // Simplified loading with guaranteed completion
   useEffect(() => {
-    // Force loading to complete after 3 seconds maximum
+    // Force loading to complete after 2.5 seconds maximum
     const loadingTimer = setTimeout(() => {
       setIsLoading(false);
-    }, 3000);
+    }, 2500);
 
     return () => clearTimeout(loadingTimer);
   }, []);
@@ -120,7 +120,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-black text-green-400 font-mono relative overflow-hidden">
-      {/* Optimized Matrix Rain Background */}
+      {/* Matrix Rain Background - with error boundary */}
       <MatrixRain intensity={0.02} />
 
       {/* Scanlines Effect */}
