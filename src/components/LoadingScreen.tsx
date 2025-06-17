@@ -23,7 +23,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
     let stepIndex = 0;
 
     const progressInterval = setInterval(() => {
-      progressValue += Math.random() * 15 + 10; // Faster progress
+      progressValue += Math.random() * 20 + 15; // Much faster progress
       
       if (progressValue >= 100) {
         progressValue = 100;
@@ -31,10 +31,10 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
         setDisplayText(loadingSteps[loadingSteps.length - 1]);
         clearInterval(progressInterval);
         
-        // Complete loading after showing 100%
+        // Complete loading quickly
         setTimeout(() => {
           onComplete();
-        }, 800);
+        }, 500);
       } else {
         setProgress(progressValue);
         
@@ -50,7 +50,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
           setDisplayText(loadingSteps[stepIndex]);
         }
       }
-    }, 120); // Faster interval
+    }, 100); // Much faster interval
 
     // Reduced fallback timeout
     const fallbackTimeout = setTimeout(() => {
@@ -58,8 +58,8 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
       clearInterval(progressInterval);
       setTimeout(() => {
         onComplete();
-      }, 300);
-    }, 2500); // Shorter fallback
+      }, 200);
+    }, 2000); // Much shorter fallback
 
     return () => {
       clearInterval(progressInterval);
@@ -69,7 +69,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
-      {/* Simplified animated background - CSS only */}
+      {/* Pure CSS animated background - no JavaScript */}
       <div className="absolute inset-0 opacity-10">
         <div 
           className="h-full w-full"
@@ -79,7 +79,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
               linear-gradient(#00ff41 1px, transparent 1px)
             `,
             backgroundSize: '50px 50px',
-            animation: 'pulse 2s infinite'
+            animation: 'matrixPulse 2s infinite'
           }}
         />
       </div>
@@ -140,7 +140,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
         </div>
       </div>
 
-      {/* Simplified scanlines effect */}
+      {/* Pure CSS scanlines effect */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="h-full w-full opacity-10" style={{
           backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, #00ff41 2px, #00ff41 4px)',
