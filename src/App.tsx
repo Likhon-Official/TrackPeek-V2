@@ -17,10 +17,10 @@ function App() {
 
   // Simplified loading with guaranteed completion
   useEffect(() => {
-    // Force loading to complete after 2.5 seconds maximum
+    // Force loading to complete after 2 seconds maximum
     const loadingTimer = setTimeout(() => {
       setIsLoading(false);
-    }, 2500);
+    }, 2000);
 
     return () => clearTimeout(loadingTimer);
   }, []);
@@ -120,8 +120,8 @@ function App() {
 
   return (
     <div className="min-h-screen bg-black text-green-400 font-mono relative overflow-hidden">
-      {/* Matrix Rain Background - with error boundary */}
-      <MatrixRain intensity={0.02} />
+      {/* Matrix Rain Background - Pure CSS implementation */}
+      <MatrixRain />
 
       {/* Scanlines Effect */}
       <div className="fixed inset-0 pointer-events-none z-10">
